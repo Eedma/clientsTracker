@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        #container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+
+        #clienti-tab,
+        #articoli-tab,
+        #clienti-tab-title,
+        #articoli-tab-title {
+            width: 46vw;
+            border: 1px solid black;
+            display: grid;
+            margin: auto;
+            grid-template-rows: auto;
+        }
+
+        #clienti-tab,
+        #clienti-tab-title {
+            grid-template-columns: repeat(4, 1fr);
+
+        }
+
+        #articoli-tab,
+        #articoli-tab-title {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        #clienti-input,
+        #articoli-input {
+            width: 40vw;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="clienti">
+            <div id="clienti-tab-title">
+                <div>id</div>
+                <div>nome</div>
+                <div>cognome</div>
+                <div>spesa</div>
+            </div>
+            <div id="clienti-tab"></div>
+            <div id="clienti-input">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="nomeCliente">
+                </div>
+                <div class="form-group">
+                    <label>Cognome</label>
+                    <input type="text" id="cognomeCliente">
+                </div>
+                <button onclick="addClient()">aggiungi cliente</button>
+            </div>
+
+        </div>
+
+        <div id="articoli">
+            <div id="articoli-tab-title">
+                <div>utente</div>
+                <div>articolo</div>
+                <div>spesa</div>
+            </div>
+            <div id="articoli-tab"></div>
+
+
+
+            <div id="articoli-input">
+                <div class="form-group">
+                    <label>seleziona cliente</label>
+                    <select id="cliente"></select>
+                </div>
+                <div class="form-group">
+                    <label>Articolo</label>
+                    <input type="text" id="articolo">
+
+                </div>
+                <div class="form-group">
+                    <label>Spesa</label>
+                    <input type="text" id="spesa">
+                </div>
+                <button onclick="registroAcquisti()">aggiungi acquisto</button>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <script>
+        let dataCliente = [];
+
+        addClient = () => {
+
+            let anagraphDataCliente = {
+                id: 0,
+                nome: '',
+                cognome: '',
+                /*acquisti: {
+                    merce : [],
+                    prezzo : []
+                }*/
+                acquisti: []
+            }
+
+            anagraphDataCliente.id += dataCliente.length + 1;
+            anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
+            anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
+
+            dataCliente.push(anagraphDataCliente);
+            //console.log(dataCliente);
+            writeClient();
+        }
+
+        writeClient = () => {
+            document.getElementById('clienti-tab').innerHTML = '';
+            for (let x = 0; x < dataCliente.length; ++x) {
+                document.getElementById('clienti-tab').innerHTML += `
+                    <div>${dataCliente[x].id}</div>
+                    <div>${dataCliente[x].nome}</div>
+                    <div>${dataCliente[x].cognome}</div>
+                    <div>tantissimi soldi</div>
+                `;
+            }
+            spesaClient();
+        }
+
+        spesaClient = () => {
+            document.getElementById('cliente').innerHTML = '';
+            for (let y = 0; y < dataCliente.length; ++y) {
+                document.getElementById('cliente').innerHTML += `
+                    <option>${dataCliente[y].nome} ${dataCliente[y].cognome}</option>
+                `;
+            }
+            //console.log(cliente);
+        }
+
+        registroAcquisti = () => {
+
+            let merce = {
+                articolo: '',
+                prezzo: ''
+            }
+            merce.articolo += document.getElementById('articolo').value;
+            merce.prezzo += document.getElementById('spesa').value;
+            for( let z = 0; z < dataCliente.length; ++z){
+                dataCliente[z].acquisti.push(merce);
+            }
+            writeAcquisti();
+        }
+
+        writeAcquisti = () => {
+            document.getElementById('articoli-tab').innerHTML = '';
+            for (let x = 0; x < dataCliente.length; ++x) {
+                document.getElementById('articoli-tab').innerHTML += `
+                    <div>${dataCliente[x].nome} ${dataCliente[x].cognome}</div>`;
+                    for(let y = 0; y < acquisti.length; ++y){
+                        document.getElementById('articoli-tab').innerHTML +=
+                        `<div>${dataCliente[x].acquisti[y].articolo}</div>
+                        <div>${dataCliente[x].acquisti[y].prezzo}</div>`;
+                        //per qualche strano motivo i valori vengono salvati nell'array, ma viene stampato un undefined nella tabella
+                    }
+            }      
+        }
+
+console.log(dataCliente);
+        
+    </script>
+</body>
+
+</html>
