@@ -8,22 +8,31 @@
     <title>Document</title>
 
     <style>
+
+        * {
+            font-family: sans-serif;
+        }
+        
         #container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            border: 1px solid black;
         }
 
         #clienti-tab,
         #articoli-tab,
         #clienti-tab-title,
         #articoli-tab-title {
-            width: 46vw;
-            border: 1px solid black;
             display: grid;
             margin: auto;
             grid-template-rows: auto;
+            justify-items: center;
         }
 
+        #clienti-tab-title,
+        #articoli-tab-title {
+            border-bottom: 1px solid black;
+        }
         #clienti-tab,
         #clienti-tab-title {
             grid-template-columns: repeat(4, 1fr);
@@ -35,11 +44,25 @@
             grid-template-columns: repeat(3, 1fr);
         }
 
+        #clienti {
+            border-right: 0.5px solid black;
+        }
+
+        #articoli {
+            border-left: 0.5px solid black;
+        }
+
         #clienti-input,
         #articoli-input {
             width: 40vw;
             margin: auto;
-            margin-top: 24px;
+            padding: 20px;
+            display: grid;
+            justify-items:stretch;
+        }
+
+        .form-group {
+            margin: 10px;
         }
     </style>
 </head>
@@ -101,7 +124,6 @@
                 acquisti: []
             }
 
-            if ( document.getElementById('nomeCliente').value != '' && document.getElementById('cognomeCliente').value != '' ){
                 anagraphDataCliente.id += dataCliente.length + 1;
                 anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
                 anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
@@ -109,9 +131,6 @@
                 writeClient();
                 document.getElementById('nomeCliente').value = '';
                 document.getElementById('cognomeCliente').value = '';
-            } else {
-                alert('Inserire nome e cognome')
-            }
         }
 
         writeClient = () => {
@@ -166,15 +185,8 @@
 
                 }
             }
+            writeClient();
         }
-
-        // updateSpesa = () => {
-        //     document.querySelector('#clienti-tab > div:last-child').innerHTML = '';
-        //     for (let x = 0; x < dataCliente.length; ++x) {
-        //         let costi = dataCliente[x].acquisti.map(y => Number(y.prezzo)).reduce((a,b) => a + b, 0);
-        //         document.querySelector('#clienti-tab > div:last-child').innerHTML += costi;
-        //     }       
-        // }
 
         console.log(dataCliente);
 
