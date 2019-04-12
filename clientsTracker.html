@@ -13,7 +13,6 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
-
         #clienti-tab,
         #articoli-tab,
         #clienti-tab-title,
@@ -40,6 +39,7 @@
         #articoli-input {
             width: 40vw;
             margin: auto;
+            margin-top: 24px;
         }
     </style>
 </head>
@@ -65,9 +65,7 @@
                 </div>
                 <button onclick="addClient()">aggiungi cliente</button>
             </div>
-
         </div>
-
         <div id="articoli">
             <div id="articoli-tab-title">
                 <div>utente</div>
@@ -75,9 +73,6 @@
                 <div>spesa</div>
             </div>
             <div id="articoli-tab"></div>
-
-
-
             <div id="articoli-input">
                 <div class="form-group">
                     <label>seleziona cliente</label>
@@ -86,55 +81,49 @@
                 <div class="form-group">
                     <label>Articolo</label>
                     <input type="text" id="articolo">
-
                 </div>
                 <div class="form-group">
                     <label>Spesa</label>
-                    <input type="text" id="spesa">
+                    <input type="number" id="spesa">
                 </div>
                 <button onclick="registroAcquisti()">aggiungi acquisto</button>
             </div>
         </div>
-
-
     </div>
-
-
-
     <script>
         let dataCliente = [];
 
         addClient = () => {
-
             let anagraphDataCliente = {
                 id: 0,
                 nome: '',
                 cognome: '',
-                /*acquisti: {
-                    merce : [],
-                    prezzo : []
-                }*/
                 acquisti: []
             }
 
-            anagraphDataCliente.id += dataCliente.length + 1;
-            anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
-            anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
-
-            dataCliente.push(anagraphDataCliente);
-            //console.log(dataCliente);
-            writeClient();
+            if ( document.getElementById('nomeCliente').value != '' && document.getElementById('cognomeCliente').value != '' ){
+                anagraphDataCliente.id += dataCliente.length + 1;
+                anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
+                anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
+                dataCliente.push(anagraphDataCliente);
+                writeClient();
+                document.getElementById('nomeCliente').value = '';
+                document.getElementById('cognomeCliente').value = '';
+            } else {
+                alert('Inserire nome e cognome')
+            }
         }
 
         writeClient = () => {
             document.getElementById('clienti-tab').innerHTML = '';
             for (let x = 0; x < dataCliente.length; ++x) {
+                let costi = dataCliente[x].acquisti.map(y => Number(y.prezzo)).reduce((a,b) => a + b, 0);
                 document.getElementById('clienti-tab').innerHTML += `
                     <div>${dataCliente[x].id}</div>
                     <div>${dataCliente[x].nome}</div>
                     <div>${dataCliente[x].cognome}</div>
-                    <div>tantissimi soldi</div>
-                `;
+                    <div>${costi}</div>
+                    `;
             }
             spesaClient();
         }
@@ -146,39 +135,51 @@
                     <option>${dataCliente[y].nome} ${dataCliente[y].cognome}</option>
                 `;
             }
-            //console.log(cliente);
         }
 
         registroAcquisti = () => {
-
             let merce = {
                 articolo: '',
                 prezzo: ''
             }
             merce.articolo += document.getElementById('articolo').value;
             merce.prezzo += document.getElementById('spesa').value;
-            for( let z = 0; z < dataCliente.length; ++z){
-                dataCliente[z].acquisti.push(merce);
+            for (let z = 0; z < dataCliente.length; ++z) {
+                if (dataCliente[z].nome + ' ' + dataCliente[z].cognome === document.getElementById('cliente').value) {
+                    dataCliente[z].acquisti.push(merce);
+                }
+
             }
             writeAcquisti();
+            document.getElementById('articolo').value = '';
+            document.getElementById('spesa').value = '';
         }
 
         writeAcquisti = () => {
             document.getElementById('articoli-tab').innerHTML = '';
             for (let x = 0; x < dataCliente.length; ++x) {
-                document.getElementById('articoli-tab').innerHTML += `
-                    <div>${dataCliente[x].nome} ${dataCliente[x].cognome}</div>`;
-                    for(let y = 0; y < acquisti.length; ++y){
-                        document.getElementById('articoli-tab').innerHTML +=
-                        `<div>${dataCliente[x].acquisti[y].articolo}</div>
+                for (let y = 0; y < dataCliente[x].acquisti.length; ++y) {
+                    document.getElementById('articoli-tab').innerHTML +=
+                        `<div>${dataCliente[x].nome} ${dataCliente[x].cognome}</div>
+                        <div>${dataCliente[x].acquisti[y].articolo}</div>
                         <div>${dataCliente[x].acquisti[y].prezzo}</div>`;
-                        //per qualche strano motivo i valori vengono salvati nell'array, ma viene stampato un undefined nella tabella
-                    }
-            }      
+
+                }
+            }
         }
 
-console.log(dataCliente);
-        
+        // updateSpesa = () => {
+        //     document.querySelector('#clienti-tab > div:last-child').innerHTML = '';
+        //     for (let x = 0; x < dataCliente.length; ++x) {
+        //         let costi = dataCliente[x].acquisti.map(y => Number(y.prezzo)).reduce((a,b) => a + b, 0);
+        //         document.querySelector('#clienti-tab > div:last-child').innerHTML += costi;
+        //     }       
+        // }
+
+        console.log(dataCliente);
+
+        //se non viene inserito uno dei valori input tra nome || cognome, merce non viene salvata all'interno di acquisti
+
     </script>
 </body>
 
