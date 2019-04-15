@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +7,10 @@
     <title>Document</title>
 
     <style>
-
         * {
             font-family: sans-serif;
         }
-        
+
         #container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -33,6 +31,7 @@
         #articoli-tab-title {
             border-bottom: 1px solid black;
         }
+
         #clienti-tab,
         #clienti-tab-title {
             grid-template-columns: repeat(4, 1fr);
@@ -46,10 +45,12 @@
 
         #clienti {
             border-right: 0.5px solid black;
+            border-top: 1px solid black;
         }
 
         #articoli {
             border-left: 0.5px solid black;
+            border-top: 1px solid black;
         }
 
         #clienti-input,
@@ -58,22 +59,33 @@
             margin: auto;
             padding: 20px;
             display: grid;
-            justify-items:stretch;
+            justify-items: stretch;
         }
 
         .form-group {
             margin: 10px;
         }
+
+        @media only screen and (max-width: 736px){
+            #container {
+            grid-template-columns: repeat(1, 1fr);
+        }
+        }
     </style>
 </head>
 
 <body>
+
     <div id="container">
+        <input type="text" placeholder="cerca utente" id="cercaUtenti" style="margin: auto auto 24px auto"
+            onkeyup="writeClient()">
+        <input type="text" placeholder="cerca articoli" id="cercaArticoli" style="margin: auto auto 24px auto"
+            onkeyup="writeAcquisti()">
         <div id="clienti">
             <div id="clienti-tab-title">
                 <div>id</div>
-                <div>nome</div>
-                <div>cognome</div>
+                <div onclick="sortBy('nome')" id="nome">nome <span id="nomeOrder"></span></div>
+                <div onclick="sortBy('cognome')" id="cognome">cognome <span id="cognomeOrder"></span></div>
                 <div>spesa</div>
             </div>
             <div id="clienti-tab"></div>
@@ -115,6 +127,7 @@
     </div>
     <script>
         let dataCliente = [];
+        let clickCount = 0;
 
         addClient = () => {
             let anagraphDataCliente = {
@@ -124,27 +137,39 @@
                 acquisti: []
             }
 
-                anagraphDataCliente.id += dataCliente.length + 1;
-                anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
-                anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
+            anagraphDataCliente.id += dataCliente.length + 1;
+            anagraphDataCliente.nome += document.getElementById('nomeCliente').value;
+            anagraphDataCliente.cognome += document.getElementById('cognomeCliente').value;
+            if (document.getElementById('nomeCliente').value != '' && document.getElementById('cognomeCliente')
+                .value != '') {
                 dataCliente.push(anagraphDataCliente);
                 writeClient();
-                document.getElementById('nomeCliente').value = '';
-                document.getElementById('cognomeCliente').value = '';
+            } else {
+                alert('inserire nome e cognome')
+            }
+            document.getElementById('nomeCliente').value = '';
+            document.getElementById('cognomeCliente').value = '';
         }
 
         writeClient = () => {
+
             document.getElementById('clienti-tab').innerHTML = '';
-            for (let x = 0; x < dataCliente.length; ++x) {
-                let costi = dataCliente[x].acquisti.map(y => Number(y.prezzo)).reduce((a,b) => a + b, 0);
+            let searchValue = (document.getElementById('cercaUtenti').value);
+            let filtraClienti = dataCliente.filter(x => x.nome.includes(searchValue) || x.cognome.includes(
+                searchValue));
+                //filtraClienti.sort((a,b)=> a.cognome.localeCompare(b.cognome))
+            for (let x = 0; x < filtraClienti.length; ++x) {
+                let costi = filtraClienti[x].acquisti.map(y => Number(y.prezzo)).reduce((a, b) => a + b, 0);
                 document.getElementById('clienti-tab').innerHTML += `
-                    <div>${dataCliente[x].id}</div>
-                    <div>${dataCliente[x].nome}</div>
-                    <div>${dataCliente[x].cognome}</div>
+                    <div>${filtraClienti[x].id}</div>
+                    <div>${filtraClienti[x].nome}</div>
+                    <div>${filtraClienti[x].cognome}</div>
                     <div>${costi}</div>
                     `;
             }
+            //console.log(filtraClienti)
             spesaClient();
+
         }
 
         spesaClient = () => {
@@ -163,35 +188,65 @@
             }
             merce.articolo += document.getElementById('articolo').value;
             merce.prezzo += document.getElementById('spesa').value;
-            for (let z = 0; z < dataCliente.length; ++z) {
-                if (dataCliente[z].nome + ' ' + dataCliente[z].cognome === document.getElementById('cliente').value) {
-                    dataCliente[z].acquisti.push(merce);
-                }
 
+            if (document.getElementById('articolo').value != '' && document.getElementById('spesa').value != '') {
+                for (let z = 0; z < dataCliente.length; ++z) {
+                    if (dataCliente[z].nome + ' ' + dataCliente[z].cognome === document.getElementById('cliente')
+                        .value) {
+                        dataCliente[z].acquisti.push(merce);
+                    }
+                }
+                writeAcquisti();
+            } else {
+                alert('inserire nome articolo e prezzo')
             }
-            writeAcquisti();
             document.getElementById('articolo').value = '';
             document.getElementById('spesa').value = '';
         }
 
         writeAcquisti = () => {
             document.getElementById('articoli-tab').innerHTML = '';
+            let ricercaArticoli = document.getElementById('cercaArticoli');
             for (let x = 0; x < dataCliente.length; ++x) {
-                for (let y = 0; y < dataCliente[x].acquisti.length; ++y) {
+                let filtraArticoli = dataCliente[x].acquisti.filter(k => k.articolo.includes(ricercaArticoli
+                .value));
+
+                //filtraArticoli.sort((a,b)=> a.articolo.localeCompare(b.articolo))
+                for (let y = 0; y < filtraArticoli.length; ++y) {
                     document.getElementById('articoli-tab').innerHTML +=
                         `<div>${dataCliente[x].nome} ${dataCliente[x].cognome}</div>
-                        <div>${dataCliente[x].acquisti[y].articolo}</div>
-                        <div>${dataCliente[x].acquisti[y].prezzo}</div>`;
-
+                        <div>${filtraArticoli[y].articolo}</div>
+                        <div>${filtraArticoli[y].prezzo}</div>`;
                 }
             }
             writeClient();
         }
 
-        console.log(dataCliente);
+        sortBy = (a) => {
+            ++clickCount;
+
+            let mustSortAscending = clickCount % 2 != 0;
+            let modifier = mustSortAscending ? -1 : 1;
+            if ( modifier === 1 ){
+                document.getElementById('nomeOrder').innerHTML = '&#x25B2;';
+            } else {
+                document.getElementById('nomeOrder').innerHTML = '&#x25BC;';
+            }
+
+
+            switch (a) {
+                case 'nome':
+                dataCliente.sort((a,b)=> a.nome.localeCompare(b.nome) * modifier)
+                break;
+                case 'cognome':
+                dataCliente.sort((a,b)=> a.cognome.localeCompare(b.cognome) * modifier)
+                break;
+            } 
+            console.log(modifier) 
+            writeClient();
+        }
 
         //se non viene inserito uno dei valori input tra nome || cognome, merce non viene salvata all'interno di acquisti
-
     </script>
 </body>
 
